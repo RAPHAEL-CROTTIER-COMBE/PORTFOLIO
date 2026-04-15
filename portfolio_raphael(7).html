@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Raphaël Crottier-Combe — Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0a0a0a;
+    --white: #ffffff;
+    --accent: #f0c040;
+    --gray: #aaaaaa;
+    --serif: 'Cormorant Garamond', Georgia, serif;
+    --sans: 'DM Sans', sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--black); color: var(--white); font-family: var(--sans); font-weight: 300; overflow-x: hidden; }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1.2rem 4rem;
+    background: rgba(10,10,10,0.92);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(240,192,64,0.2);
+  }
+  .nav-logo {
+    font-family: var(--serif); font-size: 1rem; letter-spacing: 0.08em;
+    color: var(--accent); text-decoration: none; font-weight: 400; white-space: nowrap;
+  }
+  .nav-right { display: flex; align-items: center; gap: 2.5rem; }
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links a {
+    font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--gray); text-decoration: none; transition: color 0.3s;
+  }
+  .nav-links a:hover { color: var(--accent); }
+
+  /* BOUTON PDF */
+  .btn-pdf {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase;
+    padding: 0.55rem 1.2rem;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    background: transparent;
+    cursor: pointer;
+    border-radius: 100px;
+    font-family: var(--sans);
+    transition: all 0.3s;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .btn-pdf:hover { background: var(--accent); color: var(--black); }
+  .btn-pdf svg { width: 13px; height: 13px; flex-shrink: 0; }
+
+  /* HERO */
+  #hero {
+    position: relative; min-height: 100vh;
+    display: flex; align-items: flex-end; overflow: hidden;
+  }
+  .hero-bg { position: absolute; inset: 0; z-index: 0; }
+  .hero-bg img {
+    width: 100%; height: 100%; object-fit: cover; object-position: center top;
+    display: block; filter: grayscale(20%) contrast(1.05) brightness(0.7);
+  }
+  .hero-bg-overlay {
+    position: absolute; inset: 0;
+    background:
+      linear-gradient(to right, rgba(10,10,10,0.93) 45%, rgba(10,10,10,0.25) 100%),
+      linear-gradient(to top, rgba(10,10,10,0.7) 0%, transparent 50%);
+  }
+  .hero-content {
+    position: relative; z-index: 2;
+    padding: 0 4rem 5rem;
+    max-width: 800px;
+  }
+  .hero-tag {
+    font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 2rem;
+    opacity: 0; animation: fadeUp 1s 0.3s forwards;
+  }
+  .hero-name {
+    font-family: var(--serif);
+    font-size: clamp(3.5rem, 7vw, 7rem);
+    font-weight: 300; line-height: 0.95; letter-spacing: -0.02em; color: var(--white);
+    opacity: 0; animation: fadeUp 1s 0.5s forwards;
+  }
+  /* Crottier-Combe sur une ligne */
+  .hero-name em {
+    font-style: italic; color: var(--accent);
+    display: block;
+    white-space: nowrap;
+    font-size: clamp(3rem, 6.5vw, 6.5rem);
+  }
+  .hero-sub {
+    margin-top: 2rem; font-size: 0.88rem; color: #cccccc; line-height: 1.9; max-width: 440px;
+    opacity: 0; animation: fadeUp 1s 0.7s forwards;
+  }
+  .hero-cta {
+    margin-top: 3rem;
+    display: inline-flex; align-items: center; gap: 1rem;
+    font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--white); text-decoration: none;
+    opacity: 0; animation: fadeUp 1s 0.9s forwards;
+  }
+  .hero-cta::after { content: ''; display: block; width: 40px; height: 1px; background: var(--accent); transition: width 0.3s; }
+  .hero-cta:hover::after { width: 70px; }
+  .scroll-ind {
+    position: absolute; bottom: 3rem; left: 4rem; z-index: 3;
+    display: flex; align-items: center; gap: 1rem;
+    font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gray);
+    opacity: 0; animation: fadeUp 1s 1.2s forwards;
+  }
+  .scroll-line { width: 1px; height: 40px; background: rgba(240,192,64,0.5); animation: pulse 2s infinite; }
+  .hero-year {
+    position: absolute; bottom: 3rem; right: 3rem; z-index: 3;
+    font-family: var(--serif); font-size: 1rem; letter-spacing: 0.3em; color: rgba(240,192,64,0.5);
+  }
+
+  /* ABOUT */
+  #about {
+    display: grid; grid-template-columns: 1fr 1.4fr; gap: 6rem; align-items: center;
+    padding: 8rem 4rem; background: #0d0d0d; border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .about-visual { position: relative; }
+  .about-visual img {
+    width: 100%; aspect-ratio: 3/4; object-fit: cover; object-position: center top;
+    display: block; border-radius: 2px; filter: grayscale(15%) contrast(1.05); transition: filter 0.6s;
+  }
+  .about-visual:hover img { filter: grayscale(0%) contrast(1.05); }
+  .about-accent-box {
+    position: absolute; bottom: -1.5rem; right: -1.5rem; width: 60%; height: 60%;
+    border: 1px solid rgba(240,192,64,0.3); z-index: 0; pointer-events: none;
+  }
+  .about-title { font-family: var(--serif); font-size: clamp(2.5rem,5vw,4rem); font-weight: 300; line-height: 1.1; margin-bottom: 2rem; }
+  .about-title span { font-style: italic; color: var(--accent); }
+  .about-text { font-size: 0.88rem; color: #ccc; line-height: 1.9; margin-bottom: 1.2rem; }
+  .about-divider { width: 40px; height: 1px; background: var(--accent); margin: 2rem 0; }
+  .about-tags { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+  .tag { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.4rem 1rem; border: 1px solid rgba(240,192,64,0.4); color: var(--accent); border-radius: 100px; }
+  .section-label { font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--accent); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1rem; }
+  .section-label::before { content: ''; display: block; width: 30px; height: 1px; background: var(--accent); }
+
+  /* COMPETENCES */
+  #competences { padding: 8rem 4rem; background: #0e0e0e; border-top: 1px solid rgba(255,255,255,0.06); }
+  .competences-title { font-family: var(--serif); font-size: clamp(2rem,4vw,3rem); font-weight: 300; margin-bottom: 4rem; }
+  .competences-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+  .comp-card { background: #141414; padding: 2.5rem; transition: background 0.3s; }
+  .comp-card:hover { background: #1c1c1c; }
+  .comp-icon { font-size: 1.8rem; margin-bottom: 1.2rem; display: block; color: var(--accent); }
+  .comp-name { font-family: var(--serif); font-size: 1.3rem; font-weight: 400; margin-bottom: 1rem; }
+  .comp-items { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+  .comp-items li { font-size: 0.82rem; color: #bbb; display: flex; align-items: center; gap: 0.6rem; }
+  .comp-items li::before { content: ''; display: block; width: 4px; height: 4px; background: var(--accent); border-radius: 50%; flex-shrink: 0; }
+  .comp-bar-wrap { margin-top: 1.5rem; height: 2px; background: rgba(255,255,255,0.08); border-radius: 1px; overflow: hidden; }
+  .comp-bar { height: 100%; background: var(--accent); border-radius: 1px; transform: scaleX(0); transform-origin: left; transition: transform 1s ease; }
+
+  /* PROJETS */
+  #projets { padding: 8rem 4rem; background: #0a0a0a; border-top: 1px solid rgba(255,255,255,0.06); }
+  .projects-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 4rem; }
+  .projects-title { font-family: var(--serif); font-size: clamp(2rem,4vw,3rem); font-weight: 300; margin-top: 1rem; }
+  .projects-filter { display: flex; gap: 0.5rem; }
+  .filter-btn {
+    font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase;
+    padding: 0.5rem 1.2rem; background: transparent; border: 1px solid rgba(255,255,255,0.12);
+    color: var(--gray); cursor: pointer; transition: all 0.3s; border-radius: 100px; font-family: var(--sans);
+  }
+  .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .filter-btn.active { background: var(--accent); color: var(--black); border-color: var(--accent); font-weight: 500; }
+
+  .projects-list { display: flex; flex-direction: column; gap: 2px; }
+  .project-item { background: #0f0f0f; overflow: hidden; }
+  .project-row {
+    display: grid; grid-template-columns: 80px 1fr 2fr 1fr; gap: 2rem; align-items: center;
+    padding: 2rem 2.5rem; cursor: pointer; transition: background 0.3s; position: relative;
+  }
+  .project-row::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+    background: var(--accent); transform: scaleY(0); transform-origin: bottom; transition: transform 0.3s;
+  }
+  .project-row:hover { background: #181818; }
+  .project-row:hover::before { transform: scaleY(1); }
+  .project-num { font-family: var(--serif); font-size: 2rem; color: rgba(240,192,64,0.25); font-weight: 300; line-height: 1; }
+  .project-name { font-family: var(--serif); font-size: 1.3rem; font-weight: 400; margin-bottom: 0.3rem; }
+  .project-ctx { font-size: 0.75rem; color: var(--gray); letter-spacing: 0.05em; }
+  .project-desc { font-size: 0.83rem; color: #bbb; line-height: 1.7; padding: 0 1rem; }
+  .project-tags { display: flex; flex-direction: column; align-items: flex-end; gap: 0.4rem; }
+  .ptag { font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.25rem 0.75rem; background: rgba(240,192,64,0.12); color: var(--accent); border-radius: 100px; white-space: nowrap; }
+
+  .project-detail { display: none; background: #121212; border-top: 1px solid rgba(255,255,255,0.05); }
+  .project-detail.open { display: block; }
+  .detail-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+
+  .detail-image-panel { position: relative; overflow: hidden; min-height: 380px; background: #0d0d0d; }
+  .detail-image-panel img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(10%) contrast(1.05); transition: transform 0.6s ease, filter 0.4s ease; }
+  .detail-image-panel:hover img { transform: scale(1.03); filter: grayscale(0%) contrast(1.05); }
+  .detail-image-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(10,10,10,0.6) 0%, transparent 55%); pointer-events: none; }
+  .detail-image-caption { position: absolute; bottom: 1.2rem; left: 1.5rem; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(240,192,64,0.8); z-index: 2; }
+
+  .detail-image-panel.img-contain { display: flex; align-items: center; justify-content: center; padding: 2.5rem; background: #111; }
+  .detail-image-panel.img-contain img { width: auto; height: auto; max-width: 100%; max-height: 280px; object-fit: contain; filter: none; border-radius: 4px; box-shadow: 0 8px 40px rgba(0,0,0,0.5); }
+  .detail-image-panel.img-contain:hover img { transform: scale(1.02); filter: none; }
+
+  .detail-image-duo { position: relative; overflow: hidden; min-height: 380px; background: #0d0d0d; display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
+  .detail-image-duo-item { position: relative; overflow: hidden; }
+  .detail-image-duo-item img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(10%) contrast(1.05); transition: transform 0.6s ease, filter 0.4s ease; }
+  .detail-image-duo-item:hover img { transform: scale(1.04); filter: grayscale(0%) contrast(1.05); }
+  .detail-image-duo-item .detail-image-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(10,10,10,0.6) 0%, transparent 55%); pointer-events: none; }
+  .detail-image-duo .detail-image-caption { position: absolute; bottom: 1.2rem; left: 1.5rem; z-index: 2; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(240,192,64,0.8); }
+
+  .detail-text-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+  .detail-col { padding: 2.5rem 2rem; border-left: 1px solid rgba(255,255,255,0.06); }
+  .detail-col:first-child { border-left: none; }
+  .detail-label { font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 1rem; display: block; }
+  .detail-list { list-style: none; display: flex; flex-direction: column; gap: 0.7rem; }
+  .detail-list li { font-size: 0.83rem; color: #ccc; display: flex; gap: 0.7rem; line-height: 1.6; }
+  .detail-list li::before { content: '—'; color: var(--accent); flex-shrink: 0; }
+  .detail-results { margin-top: 1.5rem; padding: 1.2rem 1.4rem; background: rgba(240,192,64,0.07); border-left: 2px solid var(--accent); }
+  .detail-results .detail-label { margin-bottom: 0.5rem; }
+  .detail-results p { font-size: 0.83rem; color: #ccc; line-height: 1.7; }
+  .detail-link { display: inline-flex; align-items: center; gap: 0.6rem; margin-top: 1.8rem; font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(240,192,64,0.4); padding-bottom: 0.3rem; transition: gap 0.3s; }
+  .detail-link:hover { gap: 1rem; }
+  .detail-link::after { content: '→'; }
+
+  /* CONTACT */
+  #contact { padding: 8rem 4rem; background: #f8f5ef; color: #0a0a0a; text-align: center; }
+  .contact-pre { font-size: 0.7rem; letter-spacing: 0.3em; text-transform: uppercase; color: #b8860b; margin-bottom: 2rem; }
+  .contact-title { font-family: var(--serif); font-size: clamp(3rem,6vw,5rem); font-weight: 300; line-height: 1.1; margin-bottom: 3rem; }
+  .contact-title em { font-style: italic; color: #b8860b; }
+  .contact-links { display: flex; justify-content: center; align-items: center; gap: 3rem; margin-bottom: 4rem; flex-wrap: wrap; }
+  .contact-link { display: flex; flex-direction: column; gap: 0.3rem; text-decoration: none; transition: transform 0.3s; }
+  .contact-link:hover { transform: translateY(-4px); }
+  .contact-link-label { font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: #999; }
+  .contact-link-val { font-size: 0.9rem; color: #0a0a0a; font-weight: 400; }
+  .contact-divider { width: 1px; height: 40px; background: #ccc; align-self: center; }
+  .footer-copy { font-size: 0.7rem; color: #aaa; letter-spacing: 0.1em; margin-top: 2rem; }
+
+  /* PRINT / PDF */
+  @media print {
+    nav, .modal-overlay, .btn-pdf, .scroll-ind, .hero-year,
+    .projects-filter, .filter-btn, .project-detail { display: none !important; }
+    body { background: white !important; color: black !important; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    #hero { min-height: auto; page-break-after: always; }
+    .hero-bg img { filter: none; }
+    section { page-break-inside: avoid; }
+    .project-detail { display: block !important; }
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes pulse { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }
+  .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease, transform 0.8s ease; }
+  .reveal.visible { opacity: 1; transform: none; }
+
+  /* HAMBURGER MENU */
+  .nav-hamburger {
+    display: none; flex-direction: column; gap: 5px; background: none;
+    border: none; cursor: pointer; padding: 4px; z-index: 110;
+  }
+  .nav-hamburger span {
+    display: block; width: 22px; height: 2px; background: var(--white);
+    border-radius: 2px; transition: all 0.3s;
+  }
+  .nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .nav-hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  .nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  .mobile-menu {
+    display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 105; background: rgba(10,10,10,0.98); backdrop-filter: blur(20px);
+    flex-direction: column; align-items: center; justify-content: center; gap: 2.5rem;
+  }
+  .mobile-menu.open { display: flex; }
+  .mobile-menu a {
+    font-family: var(--serif); font-size: 2rem; font-weight: 300;
+    color: var(--white); text-decoration: none; letter-spacing: 0.05em;
+    transition: color 0.3s;
+  }
+  .mobile-menu a:hover { color: var(--accent); }
+  .mobile-menu .btn-pdf-mobile {
+    margin-top: 1rem; font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase;
+    padding: 0.7rem 1.8rem; border: 1px solid var(--accent); color: var(--accent);
+    background: transparent; cursor: pointer; border-radius: 100px; font-family: var(--sans);
+    transition: all 0.3s; display: inline-flex; align-items: center; gap: 0.6rem;
+  }
+  .mobile-menu .btn-pdf-mobile:hover { background: var(--accent); color: var(--black); }
+
+  /* RESPONSIVE — TABLETTE */
+  @media (max-width: 1100px) {
+    .competences-grid { grid-template-columns: repeat(2, 1fr); }
+    .project-row { grid-template-columns: 60px 1fr 1.5fr; }
+    .project-tags { display: none; }
+  }
+
+  /* RESPONSIVE — MOBILE / TABLETTE */
+  @media (max-width: 900px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links, .nav-right > .btn-pdf { display: none; }
+    .nav-hamburger { display: flex; }
+    .hero-content { padding: 0 1.5rem 5rem; }
+    .hero-name { font-size: clamp(2.8rem, 10vw, 4.5rem); }
+    .hero-name em { font-size: clamp(2.4rem, 9vw, 4rem); white-space: normal; }
+    .scroll-ind { left: 1.5rem; }
+    .hero-year { right: 1.5rem; bottom: 2rem; }
+    #about { grid-template-columns: 1fr; gap: 3rem; padding: 5rem 1.5rem; }
+    .about-accent-box { display: none; }
+    #competences { padding: 5rem 1.5rem; }
+    .competences-grid { grid-template-columns: repeat(2, 1fr); gap: 2px; }
+    #projets { padding: 5rem 1.5rem; }
+    .projects-header { flex-direction: column; align-items: flex-start; gap: 1.5rem; }
+    .project-row { grid-template-columns: 50px 1fr; gap: 1rem; padding: 1.5rem 1.2rem; }
+    .project-desc, .project-tags { display: none; }
+    .detail-inner { grid-template-columns: 1fr; }
+    .detail-image-panel, .detail-image-duo { min-height: 220px; }
+    .detail-image-duo { grid-template-columns: 1fr 1fr; }
+    .detail-image-duo-item { min-height: 160px; }
+    .detail-text-panel { grid-template-columns: 1fr; }
+    #contact { padding: 5rem 1.5rem; }
+    .contact-links { flex-direction: column; gap: 1.5rem; }
+    .contact-divider { display: none; }
+  }
+
+  /* RESPONSIVE — PETIT MOBILE */
+  @media (max-width: 480px) {
+    .hero-name { font-size: clamp(2.2rem, 12vw, 3.2rem); }
+    .hero-name em { font-size: clamp(1.9rem, 11vw, 2.8rem); }
+    .hero-sub { font-size: 0.83rem; }
+    .competences-grid { grid-template-columns: 1fr; }
+    .projects-filter { flex-wrap: wrap; }
+    .detail-image-duo { grid-template-columns: 1fr; }
+    .detail-image-duo-item { min-height: 200px; }
+    .modal-box { padding: 2rem 1.5rem; }
+    .contact-link-val { font-size: 0.82rem; word-break: break-all; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#hero" class="nav-logo">Raphaël CROTTIER-COMBE</a>
+  <div class="nav-right">
+    <ul class="nav-links">
+      <li><a href="#about">À propos</a></li>
+      <li><a href="#competences">Compétences</a></li>
+      <li><a href="#projets">Projets</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <a class="btn-pdf" href="https://estd5-mkt-2026-saintjosephmoncel-g4-incontournables.fr/wp-content/uploads/2026/04/Portfolio-CROTTIER-COMBE-raphael.pdf" download target="_blank" rel="noopener noreferrer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      <span>Télécharger PDF</span>
+    </a>
+    <button class="nav-hamburger" id="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- MENU MOBILE -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#about" onclick="closeMobileMenu()">À propos</a>
+  <a href="#competences" onclick="closeMobileMenu()">Compétences</a>
+  <a href="#projets" onclick="closeMobileMenu()">Projets</a>
+  <a href="#contact" onclick="closeMobileMenu()">Contact</a>
+  <a class="btn-pdf-mobile" href="https://estd5-mkt-2026-saintjosephmoncel-g4-incontournables.fr/wp-content/uploads/2026/04/Portfolio-CROTTIER-COMBE-raphael.pdf" download target="_blank" rel="noopener noreferrer" onclick="closeMobileMenu()">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+      <polyline points="7 10 12 15 17 10"/>
+      <line x1="12" y1="15" x2="12" y2="3"/>
+    </svg>
+    Télécharger PDF
+  </a>
+</div>
+
+
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg">
+    <img
+      src="https://estd5-mkt-2026-saintjosephmoncel-g4-incontournables.fr/wp-content/uploads/2026/04/IMG_3811.png"
+      alt="Raphaël Crottier-Combe"
+      loading="eager"
+      onerror="this.parentElement.style.background='linear-gradient(135deg,#1a1a1a,#0a0a0a)'"
+    >
+    <div class="hero-bg-overlay"></div>
+  </div>
+  <div class="hero-content">
+    <p class="hero-tag">Marketing &amp; E-commerce — Pour septembre 2026</p>
+    <h1 class="hero-name">
+      Raphaël<br>
+      <em>Crottier-Combe</em>
+    </h1>
+    <p class="hero-sub">Passionné par les nouvelles technologies et l'univers automobile, je crée des expériences de communication mémorables, du design graphique à la gestion de projet en passant par la stratégie digitale.</p>
+    <a href="#projets" class="hero-cta">Voir mes projets</a>
+  </div>
+  <div class="scroll-ind"><div class="scroll-line"></div>Défiler</div>
+  <div class="hero-year">2026</div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-visual reveal">
+    <img src="https://estd5-mkt-2026-saintjosephmoncel-g4-incontournables.fr/wp-content/uploads/2026/04/photo-raphael.png" alt="Portrait Raphaël" loading="lazy">
+    <div class="about-accent-box"></div>
+  </div>
+  <div class="reveal">
+    <div class="section-label">À propos</div>
+    <h2 class="about-title">Créatif,<br><span>curieux</span> &amp;<br>engagé.</h2>
+    <p class="about-text">Passionné par les nouvelles technologies et l'univers automobile, je m'intéresse particulièrement aux innovations qui transforment notre façon de concevoir et d'utiliser les véhicules.</p>
+    <p class="about-text">Dans ce portfolio, vous retrouverez les événements et actions de communication réalisés au cours de mon alternance, illustrant mon engagement, ma créativité et mes compétences développées sur le terrain.</p>
+    <div class="about-divider"></div>
+    <div class="about-tags">
+      <span class="tag">Gestion de projet</span>
+      <span class="tag">Design graphique</span>
+      <span class="tag">Communication</span>
+      <span class="tag">Stratégie digitale</span>
+      <span class="tag">E-commerce</span>
+    </div>
+  </div>
+</section>
+
+<!-- COMPETENCES -->
+<section id="competences">
+  <div class="section-label">Compétences</div>
+  <h2 class="competences-title reveal">Ce que je maîtrise</h2>
+  <div class="competences-grid">
+    <div class="comp-card reveal">
+      <span class="comp-icon">◈</span>
+      <p class="comp-name">Design &amp; Création</p>
+      <ul class="comp-items">
+        <li>Adobe Illustrator</li>
+        <li>Identité visuelle</li>
+        <li>Supports print &amp; digital</li>
+        <li>Signalétique</li>
+      </ul>
+      <div class="comp-bar-wrap"><div class="comp-bar" style="--w:88%"></div></div>
+    </div>
+    <div class="comp-card reveal">
+      <span class="comp-icon">△</span>
+      <p class="comp-name">Gestion de projet</p>
+      <ul class="comp-items">
+        <li>Coordination prestataires</li>
+        <li>Gestion budgétaire</li>
+        <li>Organisation événementielle</li>
+        <li>Négociation &amp; achats</li>
+      </ul>
+      <div class="comp-bar-wrap"><div class="comp-bar" style="--w:90%"></div></div>
+    </div>
+    <div class="comp-card reveal">
+      <span class="comp-icon">◎</span>
+      <p class="comp-name">Stratégie digitale</p>
+      <ul class="comp-items">
+        <li>WordPress &amp; PrestaShop</li>
+        <li>SEO &amp; référencement</li>
+        <li>Communication multicanal</li>
+        <li>Analyse de marché</li>
+      </ul>
+      <div class="comp-bar-wrap"><div class="comp-bar" style="--w:80%"></div></div>
+    </div>
+    <div class="comp-card reveal">
+      <span class="comp-icon">⬡</span>
+      <p class="comp-name">Communication</p>
+      <ul class="comp-items">
+        <li>Communication interne</li>
+        <li>Animation de groupe</li>
+        <li>Création de contenus</li>
+        <li>Relations prestataires</li>
+      </ul>
+      <div class="comp-bar-wrap"><div class="comp-bar" style="--w:88%"></div></div>
+    </div>
+    <div class="comp-card reveal">
+      <span class="comp-icon">⊕</span>
+      <p class="comp-name">Développement commercial</p>
+      <ul class="comp-items">
+        <li>Benchmark concurrentiel</li>
+        <li>Étude de faisabilité</li>
+        <li>Positionnement marque</li>
+        <li>Développement franchise</li>
+      </ul>
+      <div class="comp-bar-wrap"><div class="comp-bar" style="--w:72%"></div></div>
+    </div>
+    <div class="comp-card reveal">
+      <span class="comp-icon">◇</span>
+      <p class="comp-name">Outils &amp; Logiciels</p>
+      <ul class="comp-items">
+        <li>Suite Adobe</li>
+        <li>WordPress / PrestaShop</li>
+        <li>Office 365</li>
+        <li>Outils de veille</li>
+      </ul>
+      <div class="comp-bar-wrap"><div class="comp-bar" style="--w:82%"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJETS -->
+<section id="projets">
+  <div class="projects-header">
+    <div>
+      <div class="section-label">Projets</div>
+      <h2 class="projects-title reveal">Mes réalisations</h2>
+    </div>
+    <div class="projects-filter">
+      <button class="filter-btn active" data-filter="all">Tous</button>
+      <button class="filter-btn" data-filter="entreprise">Entreprise</button>
+      <button class="filter-btn" data-filter="scolaire">Scolaire</button>
+    </div>
+  </div>
+
+  <div class="projects-list">
+
+    <!-- PROJET 01 — Pâques 2026 -->
+    <div class="project-item" data-cat="entreprise">
+      <div class="project-row" onclick="toggleProject(this)">
+        <span class="project-num">01</span>
+        <div>
+          <p class="project-name">Projet Pâques 2026</p>
+          <p class="project-ctx">Alternance — Entreprise</p>
+        </div>
+        <p class="project-desc">Pilotage du projet Pâques : achat de chocolats au meilleur rapport qualité-prix et création de boîtes personnalisées pour les collaborateurs.</p>
+        <div class="project-tags">
+          <span class="ptag">Design graphique</span>
+          <span class="ptag">Gestion de projet</span>
+        </div>
+      </div>
+      <div class="project-detail">
+        <div class="detail-inner">
+          <div class="detail-image-panel">
+            <img src="https://media.licdn.com/dms/image/v2/D4E22AQHMJe9xm9B1UA/feedshare-shrink_2048_1536/B4EZ1n7jPvJsAg-/0/1775565159924?e=1777507200&v=beta&t=67zJ9vNKOa-QYjE19y--6J_awN6PkfIDmke8dVnZ5XI" alt="Pâques 2026" loading="lazy">
+            <div class="detail-image-overlay"></div>
+            <span class="detail-image-caption">Pâques 2026 — Boîtes personnalisées</span>
+          </div>
+          <div class="detail-text-panel">
+            <div class="detail-col">
+              <span class="detail-label">Actions menées</span>
+              <ul class="detail-list">
+                <li>Négociation fournisseurs pour l'achat de chocolats au meilleur rapport qualité-prix</li>
+                <li>Création des maquettes de boîtes personnalisées sur Adobe Illustrator</li>
+                <li>Suivi de production et contrôle qualité</li>
+                <li>Coordination logistique et respect des délais</li>
+              </ul>
+              <div class="detail-results">
+                <span class="detail-label">Résultats</span>
+                <p>Projet livré dans les délais et dans le budget. Retours très positifs des collaborateurs.</p>
+              </div>
+            </div>
+            <div class="detail-col">
+              <span class="detail-label">Objectifs</span>
+              <ul class="detail-list">
+                <li>Achat de chocolats au meilleur prix</li>
+                <li>Création des boîtes personnalisées</li>
+                <li>Coordination avec les prestataires</li>
+              </ul>
+              <span class="detail-label" style="margin-top:1.8rem;">Compétences</span>
+              <ul class="detail-list">
+                <li>Gestion de projet</li>
+                <li>Négociation &amp; achats</li>
+                <li>Design graphique</li>
+                <li>Coordination externe</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROJET 02 — Journée droits des femmes -->
+    <div class="project-item" data-cat="entreprise">
+      <div class="project-row" onclick="toggleProject(this)">
+        <span class="project-num">02</span>
+        <div>
+          <p class="project-name">Journée internationale des droits des femmes</p>
+          <p class="project-ctx">Alternance — Entreprise</p>
+        </div>
+        <p class="project-desc">Organisation du Wall of Fame et distribution de roses avec messages inspirants pour le 8 mars.</p>
+        <div class="project-tags">
+          <span class="ptag">Événementiel</span>
+          <span class="ptag">Design</span>
+        </div>
+      </div>
+      <div class="project-detail">
+        <div class="detail-inner">
+          <div class="detail-image-duo">
+            <div class="detail-image-duo-item">
+              <img src="https://media.licdn.com/dms/image/v2/D4E22AQF9TrTjvfxNMA/feedshare-shrink_800/B4EZzXMKP5H0Ac-/0/1773136815443?e=1778112000&v=beta&t=jnoVzNlSsuFfw6kAVWa1OvUE8TN-FNDEY42vtSF_y0k" alt="Wall of Fame 8 mars" loading="lazy">
+              <div class="detail-image-overlay"></div>
+            </div>
+            <div class="detail-image-duo-item">
+              <img src="https://media.licdn.com/dms/image/v2/D4E22AQEuct_Vid4lSw/feedshare-shrink_800/B4EZzXMMmmJUAc-/0/1773136825890?e=1778112000&v=beta&t=Ikb9BSc-sQSS6HDSnqTlTus9rtML3injhHL50fXJDcI" alt="Roses 8 mars" loading="lazy">
+              <div class="detail-image-overlay"></div>
+            </div>
+            <span class="detail-image-caption">8 Mars 2026</span>
+          </div>
+          <div class="detail-text-panel">
+            <div class="detail-col">
+              <span class="detail-label">Wall of Fame</span>
+              <ul class="detail-list">
+                <li>Conception du concept éditorial et visuel</li>
+                <li>Réalisation et mise en forme des portraits</li>
+                <li>Production et installation des supports imprimés</li>
+              </ul>
+              <span class="detail-label" style="margin-top:1.5rem;">Distribution des roses</span>
+              <ul class="detail-list">
+                <li>Sélection d'un fleuriste local éthique</li>
+                <li>Commande de roses avec messages personnalisés</li>
+                <li>Livraison, emballage et distribution le jour J</li>
+              </ul>
+            </div>
+            <div class="detail-col">
+              <span class="detail-label">Compétences</span>
+              <ul class="detail-list">
+                <li>Design graphique</li>
+                <li>Gestion de fournisseurs</li>
+                <li>Logistique événementielle</li>
+                <li>Communication interne</li>
+              </ul>
+              <div class="detail-results">
+                <span class="detail-label">Résultats</span>
+                <p>Geste fort et symbolique ayant créé une vraie émotion collective. Impact positif sur la cohésion d'équipe.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROJET 03 — Forum de l'Emploi 2025 -->
+    <div class="project-item" data-cat="entreprise">
+      <div class="project-row" onclick="toggleProject(this)">
+        <span class="project-num">03</span>
+        <div>
+          <p class="project-name">Forum de l'Emploi 2025</p>
+          <p class="project-ctx">Alternance — Entreprise</p>
+        </div>
+        <p class="project-desc">Organisation complète du stand : signalétique, décoration, goodies M&M's personnalisés et animation lors de la journée.</p>
+        <div class="project-tags">
+          <span class="ptag">Événementiel</span>
+          <span class="ptag">Logistique</span>
+        </div>
+      </div>
+      <div class="project-detail">
+        <div class="detail-inner">
+          <div class="detail-image-duo">
+            <div class="detail-image-duo-item">
+              <img src="https://media.licdn.com/dms/image/v2/D5622AQF5Rm5MfGagiQ/feedshare-shrink_1280/B56ZaBMvXlGkAk-/0/1745924341897?e=1778112000&v=beta&t=wv0-z2UhVWftGNFveJD60pE7RnnL3tCJI-KGELWgzf0" alt="Forum Emploi Stand" loading="lazy">
+              <div class="detail-image-overlay"></div>
+            </div>
+            <div class="detail-image-duo-item">
+              <img src="https://media.licdn.com/dms/image/v2/D5622AQG8SQkln98KOA/feedshare-shrink_1280/B56ZaBMvXGGQAk-/0/1745924331713?e=1778112000&v=beta&t=y_TCjX9ez39hA1uoRmq2mfRwahsNxVbN35B7RQf5FWo" alt="Forum Emploi Goodies" loading="lazy">
+              <div class="detail-image-overlay"></div>
+            </div>
+            <span class="detail-image-caption">Forum de l'Emploi 2025</span>
+          </div>
+          <div class="detail-text-panel">
+            <div class="detail-col">
+              <span class="detail-label">Actions menées</span>
+              <ul class="detail-list">
+                <li><strong style="color:#f0c040">Design &amp; signalétique</strong> — Création et découpe des présentoirs avec le bureau d'études</li>
+                <li><strong style="color:#f0c040">Décoration</strong> — Conception et préparation de la décoration du stand</li>
+                <li><strong style="color:#f0c040">Goodies</strong> — Boîte M&amp;M's personnalisée : achat des M&amp;M's logotés, conception et fabrication</li>
+                <li><strong style="color:#f0c040">Logistique</strong> — Coordination de la production, préparation et montage</li>
+                <li><strong style="color:#f0c040">Jour J</strong> — Mise en place du stand et animation auprès des visiteurs</li>
+              </ul>
+            </div>
+            <div class="detail-col">
+              <span class="detail-label">Résultats</span>
+              <ul class="detail-list">
+                <li>Stand attractif et professionnel livré dans les délais</li>
+                <li>Goodies personnalisés très appréciés des visiteurs</li>
+              </ul>
+              <div class="detail-results" style="margin-top:1.5rem;">
+                <span class="detail-label">Compétences</span>
+                <p>Gestion de projet · Design graphique · Logistique · Travail en équipe · Communication</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROJET 04 — Etikashion -->
+    <div class="project-item" data-cat="scolaire">
+      <div class="project-row" onclick="toggleProject(this)">
+        <span class="project-num">04</span>
+        <div>
+          <p class="project-name">Projet Etikashion</p>
+          <p class="project-ctx">Master — Scolaire</p>
+        </div>
+        <p class="project-desc">Accompagnement stratégique, digital et commercial d'une marque de vêtements éthiques dans le cadre d'un projet de Master.</p>
+        <div class="project-tags">
+          <span class="ptag">Stratégie digitale</span>
+          <span class="ptag">E-commerce</span>
+        </div>
+      </div>
+      <div class="project-detail">
+        <div class="detail-inner">
+          <div class="detail-image-panel">
+            <img src="https://estd5-mkt-2026-saintjosephmoncel-g4-incontournables.fr/wp-content/uploads/2026/04/photo-accueil-page-saison-automne-homme-femme-vetement-etikashion1-2.png-1.webp" alt="Etikashion" loading="lazy">
+            <div class="detail-image-overlay"></div>
+            <span class="detail-image-caption">Etikashion — Mode éthique</span>
+          </div>
+          <div class="detail-text-panel">
+            <div class="detail-col">
+              <span class="detail-label">Actions menées</span>
+              <ul class="detail-list">
+                <li>Analyse client &amp; benchmark du marché de la mode responsable</li>
+                <li>Conception et déploiement de la boutique e-commerce</li>
+                <li>Élaboration d'une stratégie de communication multicanal</li>
+                <li>Étude de faisabilité pour un développement en franchise</li>
+              </ul>
+              <div class="detail-results">
+                <span class="detail-label">Livrable</span>
+                <p>Site internet Etikashion conçu et déployé en équipe dans le cadre du projet de Master.</p>
+              </div>
+              <a class="detail-link" href="https://estd5-mkt-2026-saintjosephmoncel-g4-incontournables.fr/" target="_blank" rel="noopener noreferrer">Voir le site</a>
+            </div>
+            <div class="detail-col">
+              <span class="detail-label">Compétences</span>
+              <ul class="detail-list">
+                <li>Stratégie digitale</li>
+                <li>E-commerce</li>
+                <li>Analyse de marché</li>
+                <li>Communication multicanal</li>
+                <li>Développement commercial</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROJET 05 — WordPress & PrestaShop -->
+    <div class="project-item" data-cat="scolaire">
+      <div class="project-row" onclick="toggleProject(this)">
+        <span class="project-num">05</span>
+        <div>
+          <p class="project-name">Formation WordPress &amp; PrestaShop</p>
+          <p class="project-ctx">BTS — Scolaire</p>
+        </div>
+        <p class="project-desc">Rôle de formateur pour un groupe de 15 camarades sur WordPress et PrestaShop en vue de la préparation à l'examen.</p>
+        <div class="project-tags">
+          <span class="ptag">Pédagogie</span>
+          <span class="ptag">WordPress</span>
+        </div>
+      </div>
+      <div class="project-detail">
+        <div class="detail-inner">
+          <div class="detail-image-panel img-contain">
+            <img src="https://estd5-mkt-2026-saintjosephmoncel-g4-incontournables.fr/wp-content/uploads/2026/04/H1-Installation-de-module-WordPress-et-Prestashop-_-une-solution-sur-mesure.png" alt="WordPress PrestaShop" loading="lazy">
+          </div>
+          <div class="detail-text-panel">
+            <div class="detail-col">
+              <span class="detail-label">Actions menées</span>
+              <ul class="detail-list">
+                <li>Conception de supports de cours et vidéos de démonstration</li>
+                <li>Animation de sessions pour 15 personnes</li>
+                <li>Organisation de séances de révision et mise en pratique</li>
+              </ul>
+              <div class="detail-results">
+                <span class="detail-label">Résultats</span>
+                <p>Groupe formé avec succès et participants préparés efficacement pour l'examen.</p>
+              </div>
+            </div>
+            <div class="detail-col">
+              <span class="detail-label">Compétences</span>
+              <ul class="detail-list">
+                <li>Pédagogie &amp; transmission</li>
+                <li>Création de contenus</li>
+                <li>WordPress &amp; PrestaShop</li>
+                <li>Animation de groupe</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <p class="contact-pre">Travaillons ensemble</p>
+  <h2 class="contact-title">Envie de collaborer ?<br><em>Contactez-moi.</em></h2>
+  <div class="contact-links">
+    <a class="contact-link" href="mailto:r.crottier-combe@hotmail.com">
+      <span class="contact-link-label">Email</span>
+      <span class="contact-link-val">r.crottier-combe@hotmail.com</span>
+    </a>
+    <div class="contact-divider"></div>
+    <a class="contact-link" href="tel:+33786588258">
+      <span class="contact-link-label">Téléphone</span>
+      <span class="contact-link-val">07 86 58 82 58</span>
+    </a>
+    <div class="contact-divider"></div>
+    <a class="contact-link" href="https://www.linkedin.com/in/raphael-crottier-combe-499b841bb/" target="_blank" rel="noopener noreferrer">
+      <span class="contact-link-label">LinkedIn</span>
+      <span class="contact-link-val">Raphaël Crottier-Combe</span>
+    </a>
+  </div>
+  <p class="footer-copy">© 2026 Raphaël Crottier-Combe — Tous droits réservés</p>
+</section>
+
+<script>
+  /* ── Projets accordéon ── */
+  function toggleProject(row) {
+    const detail = row.nextElementSibling;
+    const isOpen = detail.classList.contains('open');
+    document.querySelectorAll('.project-detail.open').forEach(d => d.classList.remove('open'));
+    if (!isOpen) detail.classList.add('open');
+  }
+
+  /* ── Filtres ── */
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const filter = btn.dataset.filter;
+      document.querySelectorAll('.project-item').forEach(item => {
+        item.style.display = (filter === 'all' || item.dataset.cat === filter) ? '' : 'none';
+      });
+    });
+  });
+
+  /* ── Menu mobile ── */
+  function toggleMobileMenu() {
+    const menu = document.getElementById('mobileMenu');
+    const btn  = document.getElementById('hamburger');
+    menu.classList.toggle('open');
+    btn.classList.toggle('open');
+    document.body.style.overflow = menu.classList.contains('open') ? 'hidden' : '';
+  }
+  function closeMobileMenu() {
+    document.getElementById('mobileMenu').classList.remove('open');
+    document.getElementById('hamburger').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  /* ── Intersection Observer (animations + barres de compétences) ── */
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        e.target.querySelectorAll('.comp-bar').forEach(bar => {
+          const match = bar.getAttribute('style') && bar.getAttribute('style').match(/--w:(\d+)%/);
+          const w = match ? parseInt(match[1]) : 80;
+          bar.style.transform = `scaleX(${w / 100})`;
+        });
+      }
+    });
+  }, { threshold: 0.15 });
+
+  document.querySelectorAll('.reveal, .comp-card').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
